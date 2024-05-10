@@ -1,23 +1,24 @@
-import requests
 import json
+
+import requests
 
 # GraphQL query
 j = 0
 while j < 20000000:
     graphql_query = {
-        "operationName": "HacktivitySearchQuery",
-        "variables": {
+        "operationName": "CompleteHacktivitySearchQuery",
+        "variables": {          
             "queryString": "*:*",
-            "size": 25,
-            "from": 0 + j,
-            "sort": {
-                "field": "disclosed_at",
-                "direction": "DESC"
+            "size":25,
+            "from":0+j,
+            "sort":{
+                "field":"disclosed_at",
+                "direction":"DESC"
+                }, 
+            "product_area":"hacktivity",
+            "product_feature":"overview"
             },
-            "product_area": "hacktivity",
-            "product_feature": "overview"
-        },
-        "query": "query HacktivitySearchQuery($queryString: String!, $from: Int, $size: Int, $sort: SortInput!) {\n me {\n id\n __typename\n }\n search(\n index: HacktivityReportIndexService\n query_string: $queryString\n from: $from\n size: $size\n sort: $sort\n ) {\n __typename\n total_count\n nodes {\n __typename\n ... on HacktivityReportDocument {\n id\n _id\n reporter {\n id\n name\n username\n ...UserLinkWithMiniProfile\n __typename\n }\n cve_ids\n cwe\n severity_rating\n upvoted: upvoted_by_current_user\n report {\n id\n databaseId: _id\n title\n substate\n url\n disclosed_at\n report_generated_content {\n id\n hacktivity_summary\n __typename\n }\n __typename\n }\n votes\n team {\n handle\n name\n medium_profile_picture: profile_picture(size: medium)\n url\n id\n currency\n ...TeamLinkWithMiniProfile\n __typename\n }\n total_awarded_amount\n latest_disclosable_action\n latest_disclosable_activity_at\n submitted_at\n __typename\n }\n }\n }\n}\n\nfragment UserLinkWithMiniProfile on User {\n id\n username\n __typename\n}\n\nfragment TeamLinkWithMiniProfile on Team {\n id\n handle\n name\n __typename\n}\n"
+        "query": "query CompleteHacktivitySearchQuery($queryString: String!, $from: Int, $size: Int, $sort: SortInput!) {   me {     id     __typename   }   search(     index: CompleteHacktivityReportIndexService     query_string: $queryString     from: $from     size: $size     sort: $sort   ) {     __typename     total_count     nodes {       __typename       ... on CompleteHacktivityReportDocument {         id         _id         reporter {           id           name           username           ...UserLinkWithMiniProfile           __typename         }         cve_ids         cwe         severity_rating         upvoted: upvoted_by_current_user         public         report {           id           databaseId: _id           title           substate           url           disclosed_at           report_generated_content {             id             hacktivity_summary             __typename           }           __typename         }         votes         team {           handle           name           medium_profile_picture: profile_picture(size: medium)           url           id           currency           ...TeamLinkWithMiniProfile           __typename         }         total_awarded_amount         latest_disclosable_action         latest_disclosable_activity_at         submitted_at         disclosed         has_collaboration         __typename       }     }   } }  fragment UserLinkWithMiniProfile on User {   id   username   __typename }  fragment TeamLinkWithMiniProfile on Team {   id   handle   name   __typename } "
     }
 
     # URL of the GraphQL endpoint
@@ -29,6 +30,7 @@ while j < 20000000:
     # Print response content
     if response.status_code == 200:
         data = response.json()
+        print(data)
         with open('h1reports.txt', 'a') as f:
             for i in data["data"]["search"]['nodes']:
                 print(i['report']['url'])
