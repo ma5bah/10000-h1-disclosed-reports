@@ -1,5 +1,4 @@
 import json
-
 import requests
 
 # GraphQL query
@@ -30,7 +29,6 @@ while j < 20000000:
     # Print response content
     if response.status_code == 200:
         data = response.json()
-        print(data)
         with open('h1reports.txt', 'a') as f:
             for i in data["data"]["search"]['nodes']:
                 print(i['report']['url'])
